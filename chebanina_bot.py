@@ -85,7 +85,7 @@ def reply_pirozhok(update: Update, context: CallbackContext) -> None:
 
 
 def reply_meme(update: Update, context: CallbackContext) -> None:
-    if update.effective_user.id in dev_ids:
+    if random()<0.5 or update.effective_user.id in dev_ids:
         meme = RedditMemeApi().get_random_meme()
         update.message.reply_text(
             meme,
