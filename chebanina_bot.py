@@ -114,7 +114,7 @@ def setup(token):
     dispatcher.add_handler(CommandHandler("start", start))
     anekdote_pat = re.compile(r'ане', re.IGNORECASE)
     pirozhok_pat = re.compile(r'п+.*р+.*(ж|ш)+', re.IGNORECASE)
-    meme_pat = re.compile(r'\sмем.*', re.IGNORECASE)   
+    meme_pat = re.compile(r'\s?мем.*', re.IGNORECASE)   
     dispatcher.add_handler(MessageHandler(Filters.regex(anekdote_pat), reply_anecdote))
     dispatcher.add_handler(MessageHandler(Filters.regex(pirozhok_pat), reply_pirozhok))
     dispatcher.add_handler(MessageHandler(Filters.regex(meme_pat), reply_meme))
