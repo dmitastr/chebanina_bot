@@ -84,9 +84,9 @@ class RedditMemeApi:
         self.api.headers.update(headers)
     
     def get_random_meme(self, subreddit="dankmemes"):
-        meme = json.loads(self.api.get(self.random_url+subreddit))
+        meme = self.api.get(self.random_url+subreddit).json()
         return meme.get("url")
-        
+
 
 if __name__=="__main__":
     logger.info(PiroshkiApi().get_random_anecdote(3, 24))
