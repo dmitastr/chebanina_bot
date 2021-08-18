@@ -1,3 +1,4 @@
+import os
 from telegram.ext import (
     Updater, 
     CallbackContext, 
@@ -7,31 +8,29 @@ from telegram.ext import (
 )
 from telegram import (
     Update,
-    ParseMode
+    ParseMode,
+    Bot
 )
 
 import logging
 import re
-import yaml
+# import yaml
 import arrow
 from random import randint, random
 from difflib import SequenceMatcher
-from api_utils import AnecdotRuApi, BaneksApi, PiroshkiApi
+from api_utils import AnecdotRuApi, BaneksApi, PiroshkiApi, RedditMemeApi
 
 
-logging.basicConfig(
-    format="%(asctime)s [%(levelname)s] %(funcName)s: %(message)s",
-    level=logging.INFO,
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler("chebanina_bot.log")
-    ]
-)
+# logging.basicConfig(
+#     format="%(asctime)s [%(levelname)s] %(funcName)s: %(message)s",
+#     level=logging.INFO,
+#     handlers=[
+#         logging.StreamHandler(),
+#         # logging.FileHandler("chebanina_bot.log")
+#     ]
+# )
 logger = logging.getLogger(__name__)
-with open("config.yml") as f:
-    config = yaml.load(f, Loader=yaml.FullLoader)
-
-BOT_TOKEN = config["bot_token"]
+logger.setLevel(logging.INFO)
 dev_ids = [40322523]
 
 
@@ -85,28 +84,39 @@ def reply_pirozhok(update: Update, context: CallbackContext) -> None:
         )
 
 
-def set_config(update: Update, context: CallbackContext) -> None:
+def reply_meme(update: Update, context: CallbackContext) -> None:
     if update.effective_user.id in dev_ids:
-        context.bot_data["probalility"] = float("".join(context.args))
-        prob = context.bot_data["probalility"]
-        update.message.reply_text("Probability of getting a joke is {0}".format(prob))
+        meme = RedditMemeApi().get_random_meme()
+        update.message.reply_text(
+            meme,
+            quote=True
+        )
+        logger.info(
+            "Send meme in chat {0} from user {1} with text {2}...".format(
+                update.effective_chat.title or update.effective_user.username,
+                update.effective_user.username,
+                meme
+            )
+        )
 
 
-def main():
-    updater = Updater(token=BOT_TOKEN, use_context=True)
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text(
+        "hello yoba",
+        quote=True
+    )
+    
+
+def setup(token):
+    bot = Bot(token=token)
+    updater = Updater(bot=bot, use_context=True)
     dispatcher = updater.dispatcher  
+    dispatcher.add_handler(CommandHandler("start", start))
     anekdote_pat = re.compile(r'ане', re.IGNORECASE)
     pirozhok_pat = re.compile(r'п+.*р+.*(ж|ш)+', re.IGNORECASE)
+    meme_pat = re.compile(r'\sмем.*', re.IGNORECASE)   
     dispatcher.add_handler(MessageHandler(Filters.regex(anekdote_pat), reply_anecdote))
     dispatcher.add_handler(MessageHandler(Filters.regex(pirozhok_pat), reply_pirozhok))
-    dispatcher.add_handler(CommandHandler("upd", set_config, pass_args=True))
+    dispatcher.add_handler(MessageHandler(Filters.regex(meme_pat), reply_meme))
 
-    job_queue = updater.job_queue
-
-    updater.start_polling()
-    updater.idle()
-
-
-if __name__ == "__main__":
-    main()
-
+    return dispatcher

@@ -1,5 +1,6 @@
 import logging
 import requests
+import json
 from bs4 import BeautifulSoup
 
 logging.basicConfig(
@@ -73,6 +74,19 @@ class PiroshkiApi:
             return anecdote
         except:
             raise ValueError
+
+
+class RedditMemeApi:
+    def __init__(self):
+        self.random_url = "https://meme-api.herokuapp.com/gimme/"
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        self.api = requests.Session()
+        self.api.headers.update(headers)
+    
+    def get_random_meme(self, subreddit="dankmemes"):
+        meme = json.loads(self.api.get(self.random_url+subreddit))
+        return meme.get("url")
+        
 
 if __name__=="__main__":
     logger.info(PiroshkiApi().get_random_anecdote(3, 24))
