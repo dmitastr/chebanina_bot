@@ -31,7 +31,7 @@ meme_pat = re.compile(r'\s?мем.*', re.IGNORECASE)
 
 def reply_on_demand(update: Update, context: CallbackContext) -> None:
     txt = update.message.text
-    if "@ChebaninaBot" in txt or random()<0.2:
+    if "@ChebaninaBot" in txt:
         anekdote = "Никаких тебе шуточек, дрочила!"
         if anekdote_pat.search(txt):
             try:
@@ -54,7 +54,7 @@ def reply_on_demand(update: Update, context: CallbackContext) -> None:
 
 
 def reply_pirozhok(update: Update, context: CallbackContext) -> None:
-    if random()<0.3:
+    if random()<0.2:
         page_num = randint(1, 100)
         offset = randint(0, 29)
         try:
