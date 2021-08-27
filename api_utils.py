@@ -44,11 +44,9 @@ class BaneksApi:
         page = self.api.get(self.random_url)
         page_parsed = BeautifulSoup(page.text, "html.parser")
         try:
-            anecdote = (
-                page_parsed.find("div", {"class": "joke"})
-                .find("section", {"itemprop": "description"})
-                .find("p")
-                .get_text(separator="\n").strip()
+            tags = page_parsed.find("div", {"class": "joke"}).find("section", {"itemprop": "description"}).find_all()
+            anecdote = "\n".join(
+                tag.get_text(separator="\n").strip() for tag in tags
             )
             return anecdote
         except:
