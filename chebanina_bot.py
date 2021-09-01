@@ -39,7 +39,15 @@ def reply_on_demand(update: Update, context: CallbackContext) -> None:
             except:
                 anekdote = AnecdotRuApi().get_random_anecdote(1)
         elif meme_pat.search(txt):
-            anekdote = RedditMemeApi().get_random_meme()
+            subreddit = "dankmemes"
+            if (
+                "ебан" in txt
+                or "сме" in txt
+                or "ёбн" in txt
+                or "пид" in txt
+            ):
+                subreddit = "darkmemers"
+            anekdote = RedditMemeApi().get_random_meme(subreddit=subreddit)
         update.message.reply_text(
             anekdote,
             quote=True
